@@ -1,16 +1,19 @@
+require "savon"
+
 module RubyD2L
   class Auth
 
     def self.connect(site_url)
       Savon::Client.new do
+        ap site_url
         wsdl.document = "#{site_url}/d2l/AuthenticationTokenService.asmx?WSDL"
         wsdl.endpoint = "#{site_url}/d2l/AuthenticationTokenService.asmx"
-        http.proxy = @@proxy_server if @@proxy_server != nil
+        #http.proxy = @@proxy_server if @@proxy_server != nil
         http.auth.ssl.verify_mode = :none
       end
     end
 
-    def self.list_soap_actions(params)
+    def list_soap_actions(params)
       site_url = params[0]
       # Get available SOAP actions
       ap connect(site_url).wsdl.soap_actions
@@ -24,9 +27,11 @@ module RubyD2L
     end
 
 
-    def self.get_token(site_url, username, password)
+    def self.get_token
+      username = RubyD2L.username
+      password = RubyD2L.password
       # RETURNS THE AUTH TOKEN
-      response =  connect(site_url).request :authenticate do
+      response =  self.connect(RubyD2L.site_url).request :authenticate do
         soap.xml = '<?xml version="1.0" encoding="utf-8"?>
         <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
           <soap:Body>

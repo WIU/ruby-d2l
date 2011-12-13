@@ -5,7 +5,7 @@ module RubyD2L
       Savon::Client.new do
         wsdl.document = "#{site_url}/D2LWS/OrgUnitManagementService-v1.asmx?WSDL"
         wsdl.endpoint = "#{site_url}/D2LWS/OrgUnitManagementService-v1.asmx"
-        http.proxy = @@proxy_server if @@proxy_server != nil
+        #http.proxy = @@proxy_server if @@proxy_server != nil
         http.auth.ssl.verify_mode = :none
       end
     end
@@ -202,7 +202,7 @@ module RubyD2L
     def self.get_course_template_by_code(template_code)
     
       # @template_code = ""
-      token = RubyD2L::Auth.get_token()
+      token = RubyD2L::Auth.get_token
       
       # site_url = params[0]
       # token = params[1]
@@ -227,12 +227,12 @@ module RubyD2L
         </soap:Header>
         <soap:Body>
           <GetCourseTemplateByCodeRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
-            <Code>'+ @template_code +'</Code>
+            <Code>'+ template_code +'</Code>
           </GetCourseTemplateByCodeRequest>
         </soap:Body>
       </soap:Envelope>'
     
-      template = connect(site_url).request :get_course_template_by_code do
+      template = self.connect(RubyD2L.site_url).request :get_course_template_by_code do
         soap.xml = the_xml
       end
     
