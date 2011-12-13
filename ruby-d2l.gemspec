@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
     "lib/ruby-d2l/grades.rb",
     "lib/ruby-d2l/org_unit.rb",
     "lib/ruby-d2l/user.rb",
+    "ruby-d2l.gemspec",
     "test/helper.rb",
     "test/test_ruby-d2l.rb"
   ]
