@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "ruby-d2l"
   gem.homepage = "http://github.com/chewie71/ruby-d2l"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = "Desire2Learn Ruby SOAP Client"
+  gem.description = "A Ruby SOAP client for accessing Desire2Learn Web Services (D2LWS)"
   gem.email = "mr-mencel@wiu.edu"
   gem.authors = ["Matt Mencel"]
   # dependencies defined in Gemfile
