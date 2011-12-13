@@ -5,7 +5,6 @@ module RubyD2L
 
     def self.connect(site_url)
       Savon::Client.new do
-        ap site_url
         wsdl.document = "#{site_url}/d2l/AuthenticationTokenService.asmx?WSDL"
         wsdl.endpoint = "#{site_url}/d2l/AuthenticationTokenService.asmx"
         #http.proxy = @@proxy_server if @@proxy_server != nil

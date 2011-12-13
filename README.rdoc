@@ -1,6 +1,6 @@
 = ruby-d2l
 
-Version 0.2.0 - Extremely limited functionality so far.  At this point it's just a proof of concept.  The only SOAP call that works is get_course_template_by_code.
+Extremely limited functionality so far.  At this point it's just a proof of concept.  Only a few SOAP calls are implemented at the moment.
 
 
 This hopefully will eventually provide a much easier way to access the Web Services SOAP interface in Desire2Learn.  This code should work with D2L versions 9.4.1 and prior.  As of D2L version 9.4.1, a new REST based interface is available.  This may be re-written to support REST when I get access to a 9.4.1 test system.
@@ -28,7 +28,7 @@ Then in your Ruby application you can use the configure block to set these value
 
 Code Example:
 
-    template =  RubyD2L::OrgUnit.get_course_template_by_code("TEMPLATE_CODE").to_hash
+    template =  RubyD2L::OrgUnit.get_course_template_by_code(:template_code => "TEMPLATE_CODE").to_hash
     ap template[:get_course_template_response][:course_template][:name].to_s
 
 

@@ -10,11 +10,11 @@ module RubyD2L
       end
     end
 
-    def self.list_soap_actions(params)
-      # Get available SOAP actions
+    # = CreateCourseOffering
+    # Get a list of available SOAP actions for OrgUnit
+    def self.list_soap_actions()
 
-      site_url = params[0]
-      ap connect(site_url).wsdl.soap_actions
+      ap connect(RubyD2L.site_url).wsdl.soap_actions
     
       # [
       #     [ 0] :link_course_offering_to_navbar,
@@ -88,89 +88,73 @@ module RubyD2L
       # ]
     end
   
-    def self.create_course_offering(params)
-    
-      # I don't use <Path>'+ @course_path +'</Path>.  Add it if you need it.
+    # = CreateCourseOffering
+    # REQUIRED: { :offering_name => "NAME", :offering_code => "CODE" }
+    # OPTIONAL: { :is_active => "true|false", :start_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss), :end_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss) }
+    # NOT IMPLEMENTED:  I don't use <Path>'+ @course_path +'</Path>.  Add it if you need it.
+    def self.create_course_offering(params={})
+      self.required_params(params, [:offering_name, :offering_code, :template_id])
       
-      @course_name = ""
-      @course_code = ""
-      @course_path = ""
-      @template_id = ""
-      @is_active = "false"
-      @start_date = DateTime.now.to_s
-      @end_date = DateTime.now.to_s
-      @can_register = "false"
-      @allow_sections = "false"
+      params = {
+        :offering_name => "",
+        :offering_code => "",
+        :template_id => "",
+        :is_active => "false",
+        :start_date => DateTime.now.to_s,
+        :end_date => DateTime.now.to_s,
+        :can_register => "false",
+        :allow_sections => "false"
+      }.merge(params)
     
-        site_url = params[0]
-        token = params[1]
-        if params[2] == nil || params[2] == "list_params"
-          ap "REQUIRED: [course_name, course_code, template_id]"
-          ap "OPTIONAL: [is_active(T/F), start_date (2011-12-12T00:00:00), end_date, can_register(T/F), allow_sections(T/F)]"
-          ap "Must be comma separated with no spaces. (e.g. -p course_name=CS100,course_code=123,is_active=false)"
-          exit
-        else
-          params[2].split(',').each do |values|
-            vals = values.split('=')
-            instance_variable_set("@#{vals[0]}", vals[1])
-          end
-        end
-
-        the_xml = '<?xml version="1.0" encoding="utf-8"?>
-        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-          <soap:Header>
-            <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
-              <Version>1.0</Version>
-              <CorellationId>12345</CorellationId>
-              <AuthenticationToken>'+ token +'</AuthenticationToken>
-            </RequestHeader>
-          </soap:Header>
-          <soap:Body>
-            <CreateCourseOfferingRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
-              <Name>'+ @course_name +'</Name>
-              <Code>'+ @course_code +'</Code>
-              <TemplateId>
-                <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">'+ @template_id +'</Id>
-                <Source xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">Desire2Learn</Source>
-              </TemplateId>
-              <IsActive>'+ @is_active +'</IsActive>
-              <StartDate>'+ @start_date +'</StartDate>
-              <EndDate>'+ @end_date +'</EndDate>
-              <CanRegister>'+ @can_register +'</CanRegister>
-              <AllowSections>'+ @allow_sections +'</AllowSections>
-            </CreateCourseOfferingRequest>
-          </soap:Body>
-        </soap:Envelope>'
-      
-        orgunit = connect(site_url).request :create_course_offering do
-          soap.xml = the_xml
-        end
-            
+      token = RubyD2L::Auth.get_token
+    
+      the_xml = '<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Header>
+          <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
+            <Version>1.0</Version>
+            <CorellationId>12345</CorellationId>
+            <AuthenticationToken>'+ token +'</AuthenticationToken>
+          </RequestHeader>
+        </soap:Header>
+        <soap:Body>
+          <CreateCourseOfferingRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
+            <Name>'+ params[:offering_name] +'</Name>
+            <Code>'+ params[:offering_code] +'</Code>
+            <TemplateId>
+              <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">'+ params[:template_id] +'</Id>
+              <Source xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">Desire2Learn</Source>
+            </TemplateId>
+            <IsActive>'+ params[:is_active] +'</IsActive>
+            <StartDate>'+ params[:start_date] +'</StartDate>
+            <EndDate>'+ params[:end_date] +'</EndDate>
+            <CanRegister>'+ params[:can_register] +'</CanRegister>
+            <AllowSections>'+ params[:allow_sections] +'</AllowSections>
+          </CreateCourseOfferingRequest>
+        </soap:Body>
+      </soap:Envelope>'
+    
+      orgunit = self.connect(RubyD2L.site_url).request :create_course_offering do
+        soap.xml = the_xml
+      end
+          
     end
 
-    def self.create_course_template(params)
+    # = CreateCourseTemplate
+    # REQUIRED: { :template_name => "NAME", :template_code => "CODE" }
+    # OPTIONAL: { :is_active => "true|false", :start_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss), :end_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss) }
+    def self.create_course_template(params={})
+      self.required_params(params, [:template_name, :template_code])
+      
+      params = {
+        :template_name => "",
+        :template_code => "",
+        :is_active => "false",
+        :start_date => DateTime.now.to_s,
+        :end_date => DateTime.now.to_s
+      }.merge(params)
     
-      # I don't use <Path>'+ @template_path +'</Path>.  Add it if you need it.
-    
-      @template_name = ""
-      @template_code = ""
-      @is_active = "false"
-      @start_date = DateTime.now.to_s
-      @end_date = DateTime.now.to_s
-    
-      site_url = params[0]
-      token = params[1]
-      if params[2] == nil || params[2] == "list_params"
-        ap "REQUIRED: [template_name, template_code]"
-        ap "OPTIONAL: [is_active(true/false), start_date(YYYY-MM-DDThh:mm:ss), end_date(YYYY-MM-DDThh:mm:ss)]"
-        ap "Must be comma separated with no spaces. (e.g. -p template_name=CS100,template_code=123,is_active=false)"
-        exit
-      else
-        params[2].split(',').each do |values|
-          vals = values.split('=')
-          instance_variable_set("@#{vals[0]}", vals[1])
-        end
-      end
+      token = RubyD2L::Auth.get_token
     
       the_xml = '<?xml version="1.0" encoding="utf-8"?>
       <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -183,39 +167,32 @@ module RubyD2L
         </soap:Header>
         <soap:Body>
           <CreateCourseTemplateRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
-            <Name>'+ @template_name +'</Name>
-            <Code>'+ @template_code +'</Code>
-            <IsActive>'+ @is_active +'</IsActive>
-            <StartDate>'+ @start_date +'</StartDate>
-            <EndDate>'+ @end_date +'</EndDate>
+            <Name>'+ params[:template_name] +'</Name>
+            <Code>'+ params[:template_code] +'</Code>
+            <IsActive>'+ params[:is_active] +'</IsActive>
+            <StartDate>'+ params[:start_date] +'</StartDate>
+            <EndDate>'+ params[:end_date] +'</EndDate>
           </CreateCourseTemplateRequest>
         </soap:Body>
       </soap:Envelope>'
     
-      template = connect(site_url).request :create_course_template do
+      template = self.connect(RubyD2L.site_url).request :create_course_template do
         soap.xml = the_xml
       end
     
-    
     end
 
-    def self.get_course_template_by_code(template_code)
-    
-      # @template_code = ""
+    # = GetCourseTemplateByCode
+    # REQUIRED: template_code => "CODE"
+    def self.get_course_template_by_code(params={})
+      self.required_params(params, [:template_code])
+      
+      params = {
+        :template_code => ""
+      }.merge(params)
+
       token = RubyD2L::Auth.get_token
       
-      # site_url = params[0]
-      # token = params[1]
-      #       if params[2] == nil || params[2] == "list_params"
-      #         ap "REQUIRED: [template_code]"
-      #         exit
-      #       else
-      #         params[2].split(',').each do |values|
-      #           vals = values.split('=')
-      #           instance_variable_set("@#{vals[0]}", vals[1])
-      #         end
-      #       end
-    
       the_xml = '<?xml version="1.0" encoding="utf-8"?>
       <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Header>
@@ -227,7 +204,7 @@ module RubyD2L
         </soap:Header>
         <soap:Body>
           <GetCourseTemplateByCodeRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
-            <Code>'+ template_code +'</Code>
+            <Code>'+ params[:template_code] +'</Code>
           </GetCourseTemplateByCodeRequest>
         </soap:Body>
       </soap:Envelope>'
@@ -237,5 +214,13 @@ module RubyD2L
       end
     
     end
+    
+    def self.required_params(passed_params={},*args)
+      required_params = *args[0]
+      required_params.each do |key|
+        raise ArgumentError.new("MISSING PARAM -- :#{key} parameter is required!") unless passed_params.has_key?(key)
+      end
+    end
+    
   end
 end
