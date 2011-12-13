@@ -24,7 +24,7 @@ module RubyD2L
     end
 
 
-    def get_token(site_url, username, password)
+    def self.get_token(site_url, username, password)
       # RETURNS THE AUTH TOKEN
       response =  connect(site_url).request :authenticate do
         soap.xml = '<?xml version="1.0" encoding="utf-8"?>
