@@ -199,21 +199,22 @@ module RubyD2L
     
     end
 
-    def self.get_course_template_by_code(params)
+    def self.get_course_template_by_code(template_code)
     
-      @template_code = ""
-  
-      site_url = params[0]
-      token = params[1]
-      if params[2] == nil || params[2] == "list_params"
-        ap "REQUIRED: [template_code]"
-        exit
-      else
-        params[2].split(',').each do |values|
-          vals = values.split('=')
-          instance_variable_set("@#{vals[0]}", vals[1])
-        end
-      end
+      # @template_code = ""
+      token = RubyD2L::Auth.get_token()
+      
+      # site_url = params[0]
+      # token = params[1]
+      #       if params[2] == nil || params[2] == "list_params"
+      #         ap "REQUIRED: [template_code]"
+      #         exit
+      #       else
+      #         params[2].split(',').each do |values|
+      #           vals = values.split('=')
+      #           instance_variable_set("@#{vals[0]}", vals[1])
+      #         end
+      #       end
     
       the_xml = '<?xml version="1.0" encoding="utf-8"?>
       <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
