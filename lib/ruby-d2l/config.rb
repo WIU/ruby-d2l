@@ -1,11 +1,11 @@
 module RubyD2L
   module Config
     
-    attr_writer :username
+    attr_accessor :username
     
-    attr_writer :password
+    attr_accessor :password
     
-    attr_writer :site_url
+    attr_accessor :site_url
     
     def reset_config!
       self.username = nil
