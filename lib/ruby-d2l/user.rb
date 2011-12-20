@@ -1,5 +1,3 @@
-require "savon"
-
 module RubyD2L
   class User
 

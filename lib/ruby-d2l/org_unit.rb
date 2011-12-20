@@ -89,9 +89,9 @@ module RubyD2L
     end
   
     # = CreateCourseOffering
-    # REQUIRED: { :offering_name => "NAME", :offering_code => "CODE" }
-    # OPTIONAL: { :is_active => "true|false", :start_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss), :end_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss) }
-    # NOT IMPLEMENTED:  I don't use <Path>'+ @course_path +'</Path>.  Add it if you need it.
+    # REQUIRED:: { :offering_name => "NAME", :offering_code => "CODE" }
+    # OPTIONAL:: { :is_active => "true|false", :start_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss), :end_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss) }
+    # NOT IMPLEMENTED::  I don't use <Path>'+ @course_path +'</Path>.  Add it if you need it.
     def self.create_course_offering(params={})
       self.required_params(params, [:offering_name, :offering_code, :template_id])
       
@@ -141,8 +141,8 @@ module RubyD2L
     end
 
     # = CreateCourseTemplate
-    # REQUIRED: { :template_name => "NAME", :template_code => "CODE" }
-    # OPTIONAL: { :is_active => "true|false", :start_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss), :end_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss) }
+    # REQUIRED:: { :template_name => "NAME", :template_code => "CODE" }
+    # OPTIONAL:: { :is_active => "true|false", :start_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss), :end_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss) }
     def self.create_course_template(params={})
       self.required_params(params, [:template_name, :template_code])
       
@@ -183,7 +183,8 @@ module RubyD2L
     end
 
     # = GetCourseTemplateByCode
-    # REQUIRED: template_code => "CODE"
+    # REQUIRED:: template_code => "CODE"
+    # RETURNS::  false if not found, values hash if found
     def self.get_course_template_by_code(params={})
       self.required_params(params, [:template_code])
       
@@ -213,6 +214,12 @@ module RubyD2L
         soap.xml = the_xml
       end
     
+      response = template.to_hash[:get_course_template_response]
+      if response.include?(:course_template)
+        return Tools.get_all_values_nested(response)
+      else
+        return false
+      end            
     end
     
     def self.required_params(passed_params={},*args)

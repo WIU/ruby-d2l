@@ -1,4 +1,4 @@
-require "savon"
+require 'savon'
 
 module RubyD2L
   class Auth

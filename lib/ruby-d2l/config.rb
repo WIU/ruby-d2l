@@ -1,6 +1,5 @@
 module RubyD2L
   module Config
-    
     attr_accessor :username
     
     attr_accessor :password
