@@ -88,6 +88,61 @@ module RubyD2L
       # ]
     end
   
+    # = AddChildOrgUnit
+    # REQUIRED:: { :parent_id = "ID", :child_id => "ID" }
+    # RETURNS::  
+    def self.add_child_org_unit(params={})
+      self.required_params(params, [:parent_id, :child_id])
+
+      params = {
+        :parent_id => "",
+        :child_id => ""
+      }.merge(params)
+      
+      token = RubyD2L::Auth.get_token
+    
+      the_xml = '<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Header>
+          <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
+            <Version>1.0</Version>
+            <CorellationId>12345</CorellationId>
+            <AuthenticationToken>'+ token +'</AuthenticationToken>
+          </RequestHeader>
+        </soap:Header>
+        <soap:Body>
+          <AddChildOrgUnitRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
+            <OrgUnitId>
+              <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">'+ params[:parent_id] +'</Id>
+              <Source xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">Desire2Learn</Source>
+            </OrgUnitId>
+            <ChildOrgUnitId>
+              <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">'+ params[:child_id] +'</Id>
+              <Source xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">Desire2Learn</Source>
+            </ChildOrgUnitId>
+          </AddChildOrgUnitRequest>
+        </soap:Body>
+      </soap:Envelope>'
+      
+      add_child = self.connect(RubyD2L.site_url).request :add_child_org_unit do
+        soap.xml = the_xml
+      end
+      
+      if add_child.to_hash.include?(:add_child_org_unit_response)
+        response = add_chile.to_hash[:add_child_org_unit_response]
+        response_hash = Tools.get_all_values_nested(response)
+        if response_hash.keys.any? {|k| k.include? "business_errors"}
+          return response_hash.keep_if {|k,v| k.include? "business_errors"}
+        else
+          return response_hash
+        end
+      else
+        return false
+      end
+            
+    end
+    
+    
     # = CreateCourseOffering
     # REQUIRED:: { :offering_name => "NAME", :offering_code => "CODE" }
     # OPTIONAL:: { :is_active => "true|false", :start_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss), :end_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss) }
@@ -134,10 +189,16 @@ module RubyD2L
         </soap:Body>
       </soap:Envelope>'
     
-      orgunit = self.connect(RubyD2L.site_url).request :create_course_offering do
+      create_offering = self.connect(RubyD2L.site_url).request :create_course_offering do
         soap.xml = the_xml
       end
           
+      response = create_offering.to_hash[:create_course_offering_response]
+      if response.include?(:course_offering)
+        return Tools.get_all_values_nested(response)
+      else
+        return false
+      end
     end
 
     # = CreateCourseTemplate
@@ -179,9 +240,58 @@ module RubyD2L
       template = self.connect(RubyD2L.site_url).request :create_course_template do
         soap.xml = the_xml
       end
-    
+
+      response = template.to_hash[:create_course_template_response]
+      if response.include?(:course_template)
+        return Tools.get_all_values_nested(response)
+      else
+        return false
+      end
     end
 
+
+    # = GetCourseOfferingByCode
+    # REQUIRED:: offering_code => "CODE"
+    # RETURNS::  false if not found, values hash if found
+    def self.get_course_offering_by_code(params={})
+      self.required_params(params, [:offering_code])
+      
+      params = {
+        :offering_code => ""
+      }.merge(params)
+
+      token = RubyD2L::Auth.get_token
+      
+      the_xml = '<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Header>
+        <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
+          <Version>1.0</Version>
+          <CorellationId>12345</CorellationId>
+          <AuthenticationToken>'+ token +'</AuthenticationToken>
+        </RequestHeader>
+        </soap:Header>
+        <soap:Body>
+          <GetCourseOfferingByCodeRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
+             <Code>'+ params[:offering_code] +'</Code>
+          </GetCourseOfferingByCodeRequest>
+        </soap:Body>
+      </soap:Envelope>'
+      
+      offering = self.connect(RubyD2L.site_url).request :get_course_offering_by_code do
+        soap.xml = the_xml
+      end
+    
+      response = offering.to_hash[:get_course_offering_response]
+      if response.include?(:course_offering)
+        return Tools.get_all_values_nested(response)
+      else
+        return false
+      end
+      
+    end
+    
+    
     # = GetCourseTemplateByCode
     # REQUIRED:: template_code => "CODE"
     # RETURNS::  false if not found, values hash if found
@@ -221,6 +331,93 @@ module RubyD2L
         return false
       end            
     end
+    
+    # = GetChildCourseTemplates
+    # REQUIRED:: org_unit_id => "ID"
+    # RETURNS::  false if not found, values hash if found
+    def self.get_child_course_templates(params={})
+      self.required_params(params, [:org_unit_id])
+            
+      params = {
+        :org_unit_id => ""
+      }.merge(params)
+      
+      token = RubyD2L::Auth.get_token
+      
+      the_xml = '<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Header>
+        <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
+          <Version>1.0</Version>
+          <CorellationId>12345</CorellationId>
+          <AuthenticationToken>'+ token +'</AuthenticationToken>
+        </RequestHeader>
+        </soap:Header>
+        <soap:Body>
+            <GetChildCourseTemplatesRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
+              <OrgUnitId>
+                <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">'+ params[:org_unit_id] +'</Id>
+                <Source xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">Desire2Learn</Source>
+              </OrgUnitId>
+            </GetChildCourseTemplatesRequest>
+        </soap:Body>
+      </soap:Envelope>'
+      
+      child_templates = self.connect(RubyD2L.site_url).request :get_child_course_templates do
+        soap.xml = the_xml
+      end
+      
+      response = child_templates.to_hash[:get_course_templates_response]
+      
+      if response.include?(:child_org_units)
+        return Tools.get_all_values_nested(response)
+      else
+        return false
+      end
+            
+    end
+    
+    # = GetDepartmentByCode
+    # REQUIRED:: :org_unit_code => "CODE"
+    # RETURNS::  false if not found, values hash if found
+    def self.get_department_by_code(params={})
+      self.required_params(params, [:org_unit_code])
+            
+      params = {
+        :org_unit_code => ""
+      }.merge(params)
+      
+      token = RubyD2L::Auth.get_token
+      
+      the_xml = '<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Header>
+        <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
+          <Version>1.0</Version>
+          <CorellationId>12345</CorellationId>
+          <AuthenticationToken>'+ token +'</AuthenticationToken>
+        </RequestHeader>
+        </soap:Header>
+        <soap:Body>
+          <GetDepartmentByCodeRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
+            <Code>'+ params[:org_unit_code] +'</Code>
+          </GetDepartmentByCodeRequest>
+        </soap:Body>
+      </soap:Envelope>'
+      
+      department = self.connect(RubyD2L.site_url).request :get_department_by_code do
+        soap.xml = the_xml
+      end
+      
+      response = department.to_hash[:get_department_response]
+      if response.include?(:department)
+        return Tools.get_all_values_nested(response)
+      else
+        return false
+      end
+      
+    end
+    
     
     def self.required_params(passed_params={},*args)
       required_params = *args[0]
