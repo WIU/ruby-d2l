@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ruby-d2l}
-  s.version = "0.3.0"
+  s.version = "0.4.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Mencel"]
-  s.date = %q{2011-12-13}
+  s.date = %q{2011-12-21}
   s.description = %q{A Ruby SOAP client for accessing Desire2Learn Web Services (D2LWS)}
   s.email = %q{mr-mencel@wiu.edu}
   s.extra_rdoc_files = [
@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
     "lib/ruby-d2l/config.rb",
     "lib/ruby-d2l/grades.rb",
     "lib/ruby-d2l/org_unit.rb",
+    "lib/ruby-d2l/tools.rb",
     "lib/ruby-d2l/user.rb",
     "ruby-d2l.gemspec",
     "test/helper.rb",
