@@ -21,9 +21,8 @@ Then in your Ruby application you can use the configure block to set these value
     RubyD2L.configure do |config|
       config.username = "D2L_WEB_SERVICES_USERNAME"
       config.password = "D2L_WEB_SERVICES_PASSWORD"
-      config.site_url = "D2L_INSTANCE_URL"  (e.g. https://d2l.mysite.edu)
-	  # soap_logging defaults to FALSE unless set
-	  config.soap_logging = true
+      config.site_url = "D2L_INSTANCE_URL"   # (e.g. https://d2l.mysite.edu)
+	  config.soap_logging = true   # defaults to FALSE unless set
     end
 
 == Documentation
