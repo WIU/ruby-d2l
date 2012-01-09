@@ -22,7 +22,7 @@ Then in your Ruby application you can use the configure block to set these value
       config.username = "D2L_WEB_SERVICES_USERNAME"
       config.password = "D2L_WEB_SERVICES_PASSWORD"
       config.site_url = "https://d2l.mysite.edu"
-	  config.soap_logging = true   # defaults to FALSE unless set
+      config.soap_logging = true   # defaults to FALSE unless set
     end
 
 == Documentation
@@ -31,7 +31,7 @@ Code Example:
 
     template =  RubyD2L::OrgUnit.get_course_template_by_code(:template_code => "TEMPLATE_CODE")
     # using awesome_print gem
-	ap template 
+    ap template 
 	
 
 
