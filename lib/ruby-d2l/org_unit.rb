@@ -129,7 +129,7 @@ module RubyD2L
       end
       
       if add_child.to_hash.include?(:add_child_org_unit_response)
-        response = add_chile.to_hash[:add_child_org_unit_response]
+        response = add_child.to_hash[:add_child_org_unit_response]
         response_hash = Tools.get_all_values_nested(response)
         if response_hash.keys.any? {|k| k.include? "business_errors"}
           return response_hash.keep_if {|k,v| k.include? "business_errors"}
@@ -410,6 +410,7 @@ module RubyD2L
       end
       
       response = department.to_hash[:get_department_response]
+
       if response.include?(:department)
         return Tools.get_all_values_nested(response)
       else

@@ -1,10 +1,10 @@
 class Tools
   
   @path = []
-  
-  @all_values = {}
    
   def self.get_all_values_nested(nested_hash={}) 
+    @all_values = {}
+        
     nested_hash.each_pair do |k,v|
       @path << k
       case v
