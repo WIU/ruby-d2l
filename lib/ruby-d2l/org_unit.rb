@@ -188,9 +188,11 @@ module RubyD2L
           </CreateCourseOfferingRequest>
         </soap:Body>
       </soap:Envelope>'
-    
+      
+      esc_xml = the_xml.gsub("&", "&amp;")
+      
       create_offering = self.connect(RubyD2L.site_url).request :create_course_offering do
-        soap.xml = the_xml
+        soap.xml = esc_xml
       end
           
       response = create_offering.to_hash[:create_course_offering_response]
@@ -237,8 +239,10 @@ module RubyD2L
         </soap:Body>
       </soap:Envelope>'
     
+      esc_xml = the_xml.gsub("&", "&amp;")
+      
       template = self.connect(RubyD2L.site_url).request :create_course_template do
-        soap.xml = the_xml
+        soap.xml = esc_xml
       end
 
       response = template.to_hash[:create_course_template_response]
