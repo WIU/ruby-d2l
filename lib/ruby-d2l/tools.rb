@@ -29,7 +29,7 @@ class Tools
       nested_hash.each_pair do |k,v|
         path << k
         case v
-          when Array, DateTime, FalseClass, Fixnum, NilClass, String, TrueClass then
+          when Array, Date, DateTime, FalseClass, Fixnum, NilClass, String, TrueClass then
             all_values.merge!({"#{path.join(".")}" => "#{v}"})
           when Hash then
             all_values.merge!(_get_all_values_nested(v, path))
