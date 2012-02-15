@@ -1,5 +1,8 @@
 = ruby-d2l
 
+SOAP = 0.4.x
+REST = 0.5+
+
 Extremely limited functionality so far.  At this point it's just a proof of concept.  Only a few SOAP calls are implemented at the moment.
 
 
