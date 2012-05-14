@@ -253,6 +253,59 @@ module RubyD2L
       end
     end
 
+    # = CreateSemester
+    # REQUIRED:: { :semester_name => "NAME", :semester_code => "CODE" }
+    # OPTIONAL:: { :is_active => "true|false", :start_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss), :end_date => DateTime.to_s (e.g. YYYYMMDDThh:mm:ss) }
+    def self.create_semester(params={})
+      self.required_params(params, [:semester_name, :semester_code, :path])
+      
+      params = {
+        :semester_name => "",
+        :semester_code => "",
+        :path => "",
+        :is_active => "true",
+        :start_date => DateTime.now.to_s,
+        :end_date => DateTime.now.to_s
+      }.merge(params)
+    
+      token = RubyD2L::Auth.get_token
+    
+      the_xml = '<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Header>
+          <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
+            <Version>1.0</Version>
+            <CorellationId>12345</CorellationId>
+            <AuthenticationToken>'+ token +'</AuthenticationToken>
+          </RequestHeader>
+        </soap:Header>
+        <soap:Body>
+          <CreateSemesterRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
+            <Name>'+ params[:semester_name] +'</Name>
+            <Code>'+ params[:semester_code] +'</Code>
+            <Path>'+ params[:path] +'</Path>
+            <IsActive>'+ params[:is_active] +'</IsActive>
+            <StartDate>'+ params[:start_date] +'</StartDate>
+            <EndDate>'+ params[:end_date] +'</EndDate>
+          </CreateSemesterRequest>
+        </soap:Body>
+      </soap:Envelope>'
+    
+      esc_xml = the_xml.gsub("&", "&amp;")
+      
+      template = self.connect(RubyD2L.site_url).request :create_semester do
+        soap.xml = esc_xml
+      end
+
+      response = template.to_hash[:create_semester_response]
+      puts response
+      if response.include?(:semester)
+        return Tools.get_all_values_nested(response)
+      else
+        return false
+      end
+    end
+
 
     # = GetCourseOfferingByCode
     # REQUIRED:: offering_code => "CODE"
@@ -416,6 +469,48 @@ module RubyD2L
       response = department.to_hash[:get_department_response]
 
       if response.include?(:department)
+        return Tools.get_all_values_nested(response)
+      else
+        return false
+      end
+      
+    end
+    
+    # = GetSemesterByCode
+    # REQUIRED:: :org_unit_code => "CODE"
+    # RETURNS::  false if not found, values hash if found
+    def self.get_semester_by_code(params={})
+      self.required_params(params, [:semester_code])
+            
+      params = {
+        :semester_code => ""
+      }.merge(params)
+      
+      token = RubyD2L::Auth.get_token
+      
+      the_xml = '<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Header>
+        <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
+          <Version>1.0</Version>
+          <CorellationId>12345</CorellationId>
+          <AuthenticationToken>'+ token +'</AuthenticationToken>
+        </RequestHeader>
+        </soap:Header>
+        <soap:Body>
+          <GetSemesterByCodeRequest xmlns="http://www.desire2learn.com/services/oums/wsdl/OrgUnitManagementService-v1_0">
+            <Code>'+ params[:semester_code] +'</Code>
+          </GetSemesterByCodeRequest>
+        </soap:Body>
+      </soap:Envelope>'
+      
+      semester = self.connect(RubyD2L.site_url).request :get_semester_by_code do
+        soap.xml = the_xml
+      end
+      
+      response = semester.to_hash[:get_semester_response]
+
+      if response.include?(:semester)
         return Tools.get_all_values_nested(response)
       else
         return false

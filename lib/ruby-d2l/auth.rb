@@ -30,7 +30,7 @@ module RubyD2L
       username = RubyD2L.username
       password = RubyD2L.password
       # RETURNS THE AUTH TOKEN
-      response =  self.connect(RubyD2L.site_url).request :authenticate do
+      response = self.connect(RubyD2L.site_url).request :authenticate do
         soap.xml = '<?xml version="1.0" encoding="utf-8"?>
         <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
           <soap:Body>
@@ -42,6 +42,7 @@ module RubyD2L
           </soap:Body>
         </soap:Envelope>'
       end
+
       token = response.to_hash[:authenticate_response][:token]
   
     end
