@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{ruby-d2l}
-  s.version = "0.4.4"
+  s.name = "ruby-d2l"
+  s.version = "0.4.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Mencel"]
-  s.date = %q{2012-02-09}
-  s.description = %q{A Ruby SOAP client for accessing Desire2Learn Web Services (D2LWS)}
-  s.email = %q{mr-mencel@wiu.edu}
+  s.date = "2012-05-14"
+  s.description = "A Ruby SOAP client for accessing Desire2Learn Web Services (D2LWS)"
+  s.email = "mr-mencel@wiu.edu"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -35,14 +35,13 @@ Gem::Specification.new do |s|
     "test/helper.rb",
     "test/test_ruby-d2l.rb"
   ]
-  s.homepage = %q{http://github.com/chewie71/ruby-d2l}
+  s.homepage = "http://github.com/chewie71/ruby-d2l"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
-  s.summary = %q{Desire2Learn Ruby SOAP Client}
+  s.rubygems_version = "1.8.21"
+  s.summary = "Desire2Learn Ruby SOAP Client"
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
