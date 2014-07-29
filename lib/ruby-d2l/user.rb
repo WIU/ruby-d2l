@@ -1,6 +1,5 @@
 module RubyD2L
   class User
-
     def self.connect(site_url)
       Savon::Client.new do
         wsdl.document = "#{site_url}/D2LWS/UserManagementService-v1.asmx?WSDL"
@@ -14,7 +13,7 @@ module RubyD2L
 
       site_url = params[0]
       ap connect(site_url).wsdl.soap_actions
-  
+
       # [
       #     [ 0] :get_active_course_offerings_ex,
       #     [ 1] :get_active_course_offerings,
@@ -49,92 +48,90 @@ module RubyD2L
       #     [30] :get_users_by_course_offerings_index,
       #     [31] :get_permitted_tasks_by_user_org_unit
       # ]
-  
     end
 
     # = EnrollUser
     # REQUIRED:: { :org_unit_id => "ID, ":user_id => "ID", :role_id => "ID" }
-    # RETURNS::  
-    def self.enroll_user(params={})
-      self.required_params(params, [:org_unit_id, :user_id, :role_id])
-      
+    # RETURNS::
+    def self.enroll_user(params = {})
+      required_params(params, [:org_unit_id, :user_id, :role_id])
+
       params = {
-        :org_unit_id => "",
-        :user_id => "",
-        :role_id => ""
+        org_unit_id: '',
+        user_id: '',
+        role_id: ''
       }.merge(params)
 
       token = RubyD2L::Auth.get_token
-      
+
       the_xml = '<?xml version="1.0" encoding="utf-8"?>
       <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Header>
         <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
           <Version>1.0</Version>
           <CorellationId>12345</CorellationId>
-          <AuthenticationToken>'+ token +'</AuthenticationToken>
+          <AuthenticationToken>' + token + '</AuthenticationToken>
         </RequestHeader>
         </soap:Header>
         <soap:Body>
           <EnrollUserRequest xmlns="http://www.desire2learn.com/services/ums/wsdl/UserManagementService-v1_0">
             <OrgUnitId>
-              <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">'+ params[:org_unit_id] +'</Id>
+              <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">' + params[:org_unit_id] + '</Id>
               <Source xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">Desire2Learn</Source>
             </OrgUnitId>
             <UserId>
-              <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">'+ params[:user_id] +'</Id>
+              <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">' + params[:user_id] + '</Id>
               <Source xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">Desire2Learn</Source>
             </UserId>
             <RoleId>
-              <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">'+ params[:role_id] +'</Id>
+              <Id xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">' + params[:role_id] + '</Id>
               <Source xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">Desire2Learn</Source>
             </RoleId>
           </EnrollUserRequest>
         </soap:Body>
       </soap:Envelope>'
-      
-      enrollment = self.connect(RubyD2L.site_url).request :enroll_user do
+
+      enrollment = connect(RubyD2L.site_url).request :enroll_user do
         soap.xml = the_xml
       end
-      
+
       if enrollment.to_hash.include?(:enroll_user_response)
         response = enrollment.to_hash[:enroll_user_response]
         response_hash = Tools.get_all_values_nested(response)
-        if response_hash.keys.any? {|k| k.include? "business_errors"}
-          return response_hash.keep_if {|k,v| k.include? "business_errors"}
+        if response_hash.keys.any? { |k| k.include? 'business_errors' }
+          return response_hash.keep_if { |k, _v| k.include? 'business_errors' }
         else
           return response_hash
         end
       else
         return false
       end
-      
     end
 
     # = EnrollUser
     # REQUIRED:: N/A
     # RETURNS::  Array of roles
-    def self.get_roles()
+    def self.get_roles
       token = RubyD2L::Auth.get_token
-      
+
       the_xml = '<?xml version="1.0" encoding="utf-8"?>
       <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Header>
          <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
            <Version>1.0</Version>
            <CorellationId>12345</CorellationId>
-           <AuthenticationToken>'+ token +'</AuthenticationToken>
+           <AuthenticationToken>' + token + '</AuthenticationToken>
          </RequestHeader>
         </soap:Header>
         <soap:Body>
           <GetRolesRequest xmlns="http://www.desire2learn.com/services/ums/wsdl/UserManagementService-v1_0" />
         </soap:Body>
       </soap:Envelope>'
-        
-      roles = self.connect(RubyD2L.site_url).request :get_roles do
+
+      roles = connect(RubyD2L.site_url).request :get_roles do
         soap.xml = the_xml
       end
-      
+
       response = roles.to_hash[:get_roles_response]
       @role_info = []
       if response.include?(:roles)
@@ -146,56 +143,52 @@ module RubyD2L
         return false
       end
     end
-    
-    
-    
-    def self.get_user_by_user_name(params={})
-      self.required_params(params, :user_name)
-      
+
+    def self.get_user_by_user_name(params = {})
+      required_params(params, :user_name)
+
       params = {
-        :user_name => ""
+        user_name: ''
       }.merge(params)
-    
+
       token = RubyD2L::Auth.get_token
-      
+
       the_xml = '<?xml version="1.0" encoding="utf-8"?>
       <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Header>
          <RequestHeader xmlns="http://www.desire2learn.com/services/common/xsd/common-v1_0">
            <Version>1.0</Version>
            <CorellationId>12345</CorellationId>
-           <AuthenticationToken>'+ token +'</AuthenticationToken>
+           <AuthenticationToken>' + token + '</AuthenticationToken>
          </RequestHeader>
         </soap:Header>
         <soap:Body>
           <GetUserByUserNameRequest xmlns="http://www.desire2learn.com/services/ums/wsdl/UserManagementService-v1_0">
-            <UserName>'+ params[:user_name] +'</UserName>
+            <UserName>' + params[:user_name] + '</UserName>
           </GetUserByUserNameRequest>
         </soap:Body>
       </soap:Envelope>'
-      
-      user = self.connect(RubyD2L.site_url).request :get_user_by_user_name do
+
+      user = connect(RubyD2L.site_url).request :get_user_by_user_name do
         soap.xml = the_xml
       end
-      
+
       # ap user.to_hash
       #   exit
-      
+
       response = user.to_hash[:get_user_response]
       if response.include?(:user)
         return Tools.get_all_values_nested(response)
       else
         return false
       end
-  
     end
-  
-    def self.required_params(passed_params={},*args)
+
+    def self.required_params(passed_params = {}, *args)
       required_params = *args[0]
       required_params.each do |key|
-        raise ArgumentError.new("MISSING PARAM -- :#{key} parameter is required!") unless passed_params.has_key?(key)
+        fail ArgumentError.new("MISSING PARAM -- :#{key} parameter is required!") unless passed_params.key?(key)
       end
     end
-  
   end
 end

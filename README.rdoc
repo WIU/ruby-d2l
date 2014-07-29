@@ -1,14 +1,11 @@
 = ruby-d2l
 
-SOAP = 0.4.x
-REST = 0.5+
-
-Extremely limited functionality so far.  At this point it's just a proof of concept.  Only a few SOAP calls are implemented at the moment.
+Extremely limited functionality so far.  At this point it's just a proof of
+concept.
 
 
-This hopefully will eventually provide a much easier way to access the Web Services SOAP interface in Desire2Learn.  This code should work with D2L versions 9.4.1 and prior.  As of D2L version 9.4.1, a new REST based interface is available.  This may be re-written to support REST when I get access to a 9.4.1 test system.
-
-I don't like that I'm having to build all the XML into this gem instead of just using the builtin stuff from Savon.  If anyone figures out how to make that work let me know.
+This should provide an easier way to access the Web Services REST interface
+in Desire2Learn.  This code should work with D2L versions 10.3 and later.
 
 == Installation
 
@@ -17,15 +14,18 @@ gem install ruby-d2l
 
 == Configuration
 
-Create a user in your Desire2Learn instance for web services.  It should have administrator privileges.
+Create a user in your Desire2Learn instance for web services.  It should have
+administrator privileges.
 
-Then in your Ruby application you can use the configure block to set these values...
+Then in your Ruby application you can use the configure block to set these
+values...
 
     RubyD2L.configure do |config|
-      config.username = "D2L_WEB_SERVICES_USERNAME"
-      config.password = "D2L_WEB_SERVICES_PASSWORD"
+      config.api_id = "API_ID"
+      config.api_key = "API_KEY"
+      config.user_id = 'USER_ID'
+      config.user_key = 'USER_KEY'
       config.site_url = "https://d2l.mysite.edu"
-      config.soap_logging = true   # defaults to FALSE unless set
     end
 
 == Documentation
@@ -34,22 +34,24 @@ Code Example:
 
     template =  RubyD2L::OrgUnit.get_course_template_by_code(:template_code => "TEMPLATE_CODE")
     # using awesome_print gem
-    ap template 
-	
-
+    ap template
 
 == Contributing to ruby-d2l
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
+
+* Check out the latest master to make sure the feature hasn't been implemented
+or the bug hasn't been fixed yet
+* Check out the issue tracker to make sure someone already hasn't requested it
+and/or contributed it
 * Fork the project
 * Start a feature/bugfix branch
 * Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+* Make sure to add tests for it. This is important so I don't break it in a
+future version unintentionally.
+* Please try not to mess with the Rakefile, version, or history. If you want
+to have your own version, or is otherwise necessary, that is fine, but please
+isolate to its own commit so I can cherry-pick around it.
 
 == Copyright
 
-Copyright (c) 2011 Matt Mencel. See LICENSE.txt for
+Copyright (c) 2014 Matt Mencel. See LICENSE.txt for
 further details.
-
