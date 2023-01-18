@@ -23,7 +23,7 @@ GEM
       racc (~> 1.4)
     nori (1.1.5)
     racc (1.6.0)
-    rack (2.2.3)
+    rack (3.0.4.1)
     rake (13.0.3)
     rchardet (1.8.0)
     rcov (0.9.11)
