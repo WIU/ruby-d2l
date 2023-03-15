@@ -27,7 +27,7 @@ GEM
     nori (1.1.5)
     public_suffix (5.0.1)
     racc (1.6.2)
-    rack (3.0.4.1)
+    rack (3.0.6.1)
     rake (13.0.3)
     rchardet (1.8.0)
     rcov (0.9.11)
